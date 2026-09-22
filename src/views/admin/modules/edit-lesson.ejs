@@ -1,0 +1,190 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-indigo-400 font-semibold mb-1">
+        <a href="/admin/courses/<%= course.id %>/modules" class="hover:underline">&larr; Kembali ke Modul Tree</a>
+      </div>
+      <h1 class="text-2xl font-extrabold text-white tracking-tight">Edit Materi (Lesson)</h1>
+      <p class="text-xs text-slate-400 mt-0.5">Kelas: <strong class="text-slate-200"><%= course.title %></strong></p>
+    </div>
+  </div>
+
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+    <form action="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>/edit" method="POST" class="space-y-5">
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Pilih Bab / Modul *</label>
+        <select name="module_id" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+          <% modules.forEach(m => { %>
+            <option value="<%= m.id %>" <%= lesson.module_id === m.id ? 'selected' : '' %>>
+              <%= m.parent_id ? '↳ ' : '📂 ' %><%= m.title %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Judul Materi *</label>
+        <input type="text" name="title" required value="<%= lesson.title %>" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Format Materi *</label>
+          <select name="content_type" id="content_type_select" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+            <option value="text" <%= lesson.content_type === 'text' ? 'selected' : '' %>>📄 Artikel / Teks & Gambar (Tanpa Video)</option>
+            <option value="video" <%= lesson.content_type === 'video' ? 'selected' : '' %>>🎥 Video (YouTube / MP4)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Urutan (Order Index)</label>
+          <input type="number" name="order_index" value="<%= lesson.order_index %>" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+        </div>
+      </div>
+
+      <div id="video_url_field" class="<%= lesson.content_type === 'video' ? '' : 'hidden' %>">
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">URL Video (YouTube Embed / MP4)</label>
+        <input type="url" name="video_url" value="<%= lesson.video_url || '' %>" placeholder="https://www.youtube.com/embed/..." class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+      </div>
+
+      <!-- Editor Isi Materi dengan Paste Ctrl+V & Tombol Upload Gambar + Mermaid Diagram Helper -->
+      <div>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+          <label class="block text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <i data-lucide="file-text" class="w-4 h-4 text-indigo-400"></i> Isi Materi / Artikel Teks (Mendukung Markdown & Diagram)
+          </label>
+          <div class="flex items-center gap-2">
+            <!-- Mermaid Builder Button -->
+            <button type="button" onclick="openMermaidModal('body_text_editor')" class="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors">
+              <i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-400"></i> 📊 + Diagram Mermaid
+            </button>
+            <label for="lesson_image_upload" class="cursor-pointer px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-colors">
+              <i data-lucide="image" class="w-3.5 h-3.5"></i> + Gambar
+            </label>
+            <input type="file" id="lesson_image_upload" accept="image/*" class="hidden">
+            <span class="text-[11px] text-amber-400/90 font-medium hidden sm:inline-block">💡 Ctrl+V Gambar</span>
+          </div>
+        </div>
+
+        <div class="relative">
+          <textarea id="body_text_editor" name="body_text" rows="12" placeholder="Tuliskan materi pelajaran di sini...&#10;&#10;✨ TIPS: Mendukung Markdown, tag ```mermaid untuk diagram alur/arsitektur, dan tekan Ctrl + V untuk langsung upload & paste gambar screenshot!" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500 leading-relaxed"><%= lesson.body_text || '' %></textarea>
+          
+          <!-- Uploading Overlay / Indicator -->
+          <div id="upload_indicator" class="hidden absolute bottom-3 right-3 px-3 py-1.5 bg-indigo-600/90 backdrop-blur-md text-white rounded-lg text-[11px] font-semibold flex items-center gap-2 shadow-lg animate-pulse">
+            <span class="animate-spin">⏳</span> Mengupload gambar...
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1.5">Format didukung: Heading (`#`), Bold (`**`), List, Diagram (` ```mermaid `), dan Gambar Markdown (`![caption](/url)`).</p>
+      </div>
+
+      <div class="p-4 bg-slate-950 rounded-xl border border-slate-800">
+        <label class="flex items-center gap-3 cursor-pointer select-none">
+          <input type="checkbox" name="is_preview" value="1" <%= lesson.is_preview === 1 ? 'checked' : '' %> class="w-4 h-4 rounded border-slate-800 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+          <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+            <i data-lucide="lock-open" class="w-3.5 h-3.5"></i> Gratiskan Materi Ini (Free Preview Tester)
+          </span>
+        </label>
+        <span class="text-[11px] text-slate-500 mt-1 block pl-7">Centang jika materi ini boleh diakses secara gratis oleh siapa saja tanpa harus membeli kelas.</span>
+      </div>
+
+      <div class="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+        <a href="/admin/courses/<%= course.id %>/modules" class="px-5 py-2.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">Batal</a>
+        <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2">
+          <i data-lucide="save" class="w-4 h-4"></i> Simpan Materi
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Toggle Video Input Field
+  const typeSelect = document.getElementById('content_type_select');
+  const videoField = document.getElementById('video_url_field');
+  if (typeSelect && videoField) {
+    typeSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'video') {
+        videoField.classList.remove('hidden');
+      } else {
+        videoField.classList.add('hidden');
+      }
+    });
+  }
+
+  // Ctrl+V Paste Image & File Upload Handler
+  const textarea = document.getElementById('body_text_editor');
+  const fileUploadInput = document.getElementById('lesson_image_upload');
+  const uploadIndicator = document.getElementById('upload_indicator');
+
+  async function uploadImageFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+
+    uploadIndicator.classList.remove('hidden');
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await fetch('/admin/api/upload-image', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (data.success && data.url) {
+        insertTextAtCursor(textarea, `\n![Gambar](${data.url})\n`);
+      } else {
+        alert('Gagal upload gambar: ' + (data.message || 'Terjadi kesalahan'));
+      }
+    } catch (err) {
+      alert('Error saat upload gambar: ' + err.message);
+    } finally {
+      uploadIndicator.classList.add('hidden');
+    }
+  }
+
+  function insertTextAtCursor(input, textToInsert) {
+    const startPos = input.selectionStart;
+    const endPos = input.selectionEnd;
+    const currentVal = input.value;
+
+    input.value = currentVal.substring(0, startPos) + textToInsert + currentVal.substring(endPos, currentVal.length);
+    input.focus();
+    input.selectionStart = startPos + textToInsert.length;
+    input.selectionEnd = startPos + textToInsert.length;
+  }
+
+  // Event: Paste (Ctrl+V)
+  if (textarea) {
+    textarea.addEventListener('paste', (e) => {
+      const clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData) return;
+
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const file = items[i].getAsFile();
+          if (file) {
+            e.preventDefault();
+            uploadImageFile(file);
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  // Event: Button Upload File Image
+  if (fileUploadInput) {
+    fileUploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        uploadImageFile(file);
+        fileUploadInput.value = '';
+      }
+    });
+  }
+</script>
+
+<%- include('../../partials/mermaid-modal') %>
+</script>

@@ -1,0 +1,130 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-indigo-400 font-semibold mb-1">
+        <a href="/admin/submissions" class="hover:underline">&larr; Kembali ke Daftar Tugas</a>
+      </div>
+      <h1 class="text-2xl font-extrabold text-white tracking-tight">Review Tugas Akhir Siswa</h1>
+      <p class="text-xs text-slate-400 mt-0.5">Siswa: <strong class="text-slate-200"><%= sub.user_name %></strong> (<%= sub.user_email %>)</p>
+    </div>
+
+    <div>
+      <% if (sub.status === 'approved') { %>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+          <i data-lucide="circle-check" class="w-4 h-4"></i> Lulus (Approved)
+        </span>
+      <% } else if (sub.status === 'rejected') { %>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1.5">
+          <i data-lucide="circle-x" class="w-4 h-4"></i> Perlu Revisi (Rejected)
+        </span>
+      <% } else { %>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5 animate-pulse">
+          <i data-lucide="clock" class="w-4 h-4"></i> Menunggu Review
+        </span>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left 2 Cols: Submission Content -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- Course Info & Instructions -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Kelas yang Diikuti</h2>
+        <h3 class="text-lg font-bold text-white mb-3"><%= sub.course_title %></h3>
+        <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300">
+          <strong class="text-slate-200 block mb-2 font-semibold">Instruksi Tugas Akhir:</strong>
+          <div class="article-content max-w-none">
+            <% if (typeof renderedInstructionsHtml !== 'undefined' && renderedInstructionsHtml) { %>
+              <%- renderedInstructionsHtml %>
+            <% } else { %>
+              <p class="text-slate-300"><%= sub.final_project_instructions || 'Kerjakan tugas akhir sesuai standar kurikulum kelas.' %></p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student's Submitted Content -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
+          <i data-lucide="folder-check" class="w-4 h-4 text-emerald-400"></i> Hasil Pengerjaan Siswa
+        </h2>
+
+        <!-- Text / Link Submission -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Deskripsi / Link Tugas (GitHub / Demo / Catatan):</label>
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-200 font-mono whitespace-pre-line leading-relaxed">
+            <%= sub.text_content || '(Siswa tidak menyertakan catatan teks)' %>
+          </div>
+        </div>
+
+        <!-- File Uploaded (If any) -->
+        <% if (sub.file_url) { %>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1.5">File Lampiran Proyek (ZIP / PDF / Dokumen):</label>
+            <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center">
+                  <i data-lucide="file-archive" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white"><%= sub.file_name || 'Lampiran Tugas Akhir' %></div>
+                  <div class="text-[10px] text-slate-500 font-mono"><%= sub.file_url %></div>
+                </div>
+              </div>
+
+              <a href="<%= sub.file_url %>" download class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition-all">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Download File
+              </a>
+            </div>
+          </div>
+        <% } %>
+
+        <div class="text-[11px] text-slate-500 pt-2 border-t border-slate-800">
+          Dikirim pada: <strong><%= new Date(sub.created_at).toLocaleString('id-ID') %></strong>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right 1 Col: Review Action & Feedback Form -->
+    <div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl sticky top-24 space-y-5">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
+          <i data-lucide="shield-check" class="w-4 h-4 text-indigo-400"></i> Form Keputusan Admin
+        </h2>
+
+        <% if (sub.certificate_code) { %>
+          <div class="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+            <span class="text-[10px] uppercase font-bold text-emerald-400 block mb-0.5">Kode Sertifikat Terbit</span>
+            <code class="font-mono text-xs font-bold text-white"><%= sub.certificate_code %></code>
+          </div>
+        <% } %>
+
+        <form action="/admin/submissions/<%= sub.id %>/review" method="POST" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Feedback / Catatan Review *</label>
+            <textarea name="admin_feedback" rows="5" required placeholder="Tuliskan feedback ke siswa (apakah sudah sesuai standar atau poin apa saja yang harus diperbaiki jika reject)..." class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 leading-relaxed"><%= sub.admin_feedback || '' %></textarea>
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <button type="submit" name="action" value="approve" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2">
+              <i data-lucide="circle-check" class="w-4 h-4"></i> LULUSKAN & TERBITKAN SERTIFIKAT
+            </button>
+
+            <button type="submit" name="action" value="reject" onclick="return confirm('Yakin ingin menolak tugas ini? Siswa harus mengulang/merevisi tugasnya.')" class="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 font-semibold rounded-xl text-xs transition-colors flex items-center justify-center gap-2">
+              <i data-lucide="circle-x" class="w-4 h-4"></i> TOLAK TUGAS (REVISI / NGULANG)
+            </button>
+          </div>
+        </form>
+
+        <div class="text-[11px] text-slate-500 pt-3 border-t border-slate-800">
+          💡 Jika disetujui (Approve), siswa akan langsung mendapatkan akses halaman Sertifikat Kelulusan resmi.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

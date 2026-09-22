@@ -1,0 +1,96 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-extrabold text-white tracking-tight">Kelas Saya</h1>
+    <p class="text-xs text-slate-400 mt-1">Daftar kelas yang sudah kamu ikuti. Selesaikan materi & kumpulkan tugas akhir untuk meraih sertifikat!</p>
+  </div>
+
+  <% if (enrollments.length === 0) { %>
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center max-w-lg mx-auto">
+      <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="book-open" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-white">Belum Ada Kelas yang Diikuti</h3>
+      <p class="text-xs text-slate-400 mt-1 mb-6">Kamu belum bergabung ke kelas mana pun. Yuk cari kelas yang kamu minati!</p>
+      <a href="/" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all">
+        <i data-lucide="compass" class="w-4 h-4"></i> Lihat Katalog Kelas
+      </a>
+    </div>
+  <% } else { %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% enrollments.forEach(c => { %>
+        <% 
+          const percent = c.total_lessons > 0 ? Math.round((c.completed_lessons / c.total_lessons) * 100) : 0;
+          const statusVal = c.submission_status || c.final_status;
+        %>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col hover:border-slate-700 transition-all">
+          <div class="aspect-video bg-slate-950 relative overflow-hidden">
+            <% if (c.thumbnail_url) { %>
+              <img src="<%= c.thumbnail_url %>" alt="<%= c.title %>" class="w-full h-full object-cover">
+            <% } else { %>
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-tr from-slate-900 to-indigo-950 text-indigo-400">
+                <i data-lucide="graduation-cap" class="w-10 h-10 opacity-60"></i>
+              </div>
+            <% } %>
+
+            <!-- Badge Status Kelulusan / Sertifikat -->
+            <div class="absolute top-3 right-3">
+              <% if (statusVal === 'approved') { %>
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/90 backdrop-blur-md text-white shadow-lg flex items-center gap-1">
+                  <i data-lucide="award" class="w-3 h-3"></i> LULUS & BERSERTIFIKAT
+                </span>
+              <% } else if (statusVal === 'pending') { %>
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500/90 backdrop-blur-md text-white shadow-lg flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3 h-3"></i> TUGAS DI-REVIEW
+                </span>
+              <% } else if (statusVal === 'rejected') { %>
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-rose-500/90 backdrop-blur-md text-white shadow-lg flex items-center gap-1">
+                  <i data-lucide="circle-alert" class="w-3 h-3"></i> REVISI TUGAS
+                </span>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-white text-base leading-snug mb-2 line-clamp-1"><%= c.title %></h3>
+              <p class="text-xs text-slate-400 line-clamp-2 mb-4"><%= c.description || 'Tidak ada deskripsi.' %></p>
+            </div>
+
+            <div class="space-y-3 pt-3 border-t border-slate-800">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400">Progress Belajar</span>
+                <span class="font-bold text-indigo-400"><%= percent %>% (<%= c.completed_lessons %>/<%= c.total_lessons %>)</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                <div class="bg-indigo-500 h-2 rounded-full transition-all duration-300" style="width: <%= percent %>%"></div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mt-2">
+                <a href="/course/<%= c.slug %>/learn" class="py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1 shadow-md shadow-indigo-600/20 transition-all">
+                  <i data-lucide="play" class="w-3.5 h-3.5"></i> Masuk Kelas
+                </a>
+                
+                <% if (statusVal === 'approved' && c.certificate_code) { %>
+                  <a href="/certificate/<%= c.certificate_code %>" class="py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition-all">
+                    <i data-lucide="award" class="w-3.5 h-3.5"></i> Sertifikat
+                  </a>
+                <% } else { %>
+                  <a href="/course/<%= c.slug %>/final-project" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-1 border border-slate-700 transition-all">
+                    <i data-lucide="file-check" class="w-3.5 h-3.5"></i> Tugas Akhir
+                  </a>
+                <% } %>
+              </div>
+
+              <!-- Tombol Batalkan / Keluar dari Kelas -->
+              <form action="/course/<%= c.slug %>/unenroll" method="POST" onsubmit="return confirm('Apakah kamu yakin ingin keluar dari kelas <%= c.title %>? Seluruh progres belajar materi dan tugas di kelas ini akan dihapus.');" class="mt-2">
+                <button type="submit" class="w-full py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors">
+                  <i data-lucide="user-x" class="w-3 h-3"></i> Keluar / Hapus Pendaftaran Kelas
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

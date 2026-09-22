@@ -1,0 +1,174 @@
+<!-- Mermaid Live Editor & Visualizer Modal Component -->
+<div id="mermaid-builder-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md items-center justify-center p-4 sm:p-6" onclick="if(event.target === this) closeMermaidModal()">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
+          <i data-lucide="git-branch" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Mermaid Diagram Builder & Live Preview</h3>
+          <p class="text-[11px] text-slate-400">Rancang diagram alur, arsitektur, ERD, atau sequence dan sisipkan langsung ke materi</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeMermaidModal()" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body: Editor on Left, Live Preview on Right -->
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-6 overflow-hidden min-h-0 bg-slate-950/30">
+      
+      <!-- Left Column: Code Editor & Templates -->
+      <div class="flex flex-col h-full space-y-3 min-h-0">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-slate-300">Syntax Mermaid Code:</label>
+          
+          <!-- Quick Templates Dropdown -->
+          <select id="mermaid_template_select" onchange="applyMermaidTemplate(this.value)" class="px-2.5 py-1 bg-slate-900 border border-slate-800 text-indigo-300 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+            <option value="">⚡ Pilih Template Cepat...</option>
+            <option value="flowchart">1. Flowchart Alur Keputusan</option>
+            <option value="sequence">2. Sequence Diagram (API / Auth)</option>
+            <option value="architecture">3. Arsitektur Sistem (Client-Server-DB)</option>
+            <option value="erd">4. Entity Relationship Diagram (ERD)</option>
+            <option value="mindmap">5. Mindmap Kurikulum</option>
+          </select>
+        </div>
+
+        <textarea id="mermaid_code_input" class="w-full flex-1 min-h-[220px] p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500 leading-relaxed resize-none" placeholder="Tulis kode mermaid di sini..."></textarea>
+      </div>
+
+      <!-- Right Column: Live SVG Preview -->
+      <div class="flex flex-col h-full space-y-3 min-h-0">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+            <i data-lucide="eye" class="w-3.5 h-3.5"></i> Live Visual Preview
+          </span>
+          <span id="mermaid_status_indicator" class="text-[10px] text-emerald-400 font-medium">● Valid</span>
+        </div>
+
+        <div class="w-full flex-1 min-h-[220px] p-4 bg-slate-950/80 border border-slate-800 rounded-2xl overflow-auto flex items-center justify-center relative" id="mermaid_preview_container">
+          <div id="mermaid_live_target" class="w-full flex justify-center"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-6 py-4 border-t border-slate-800 flex items-center justify-between bg-slate-950/60">
+      <span class="text-xs text-slate-500">Diagram otomatis dirender sebagai vektor SVG interaktif di sisi siswa.</span>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="closeMermaidModal()" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors">Batal</button>
+        <button type="button" onclick="insertMermaidToEditor()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2">
+          <i data-lucide="check" class="w-4 h-4"></i> Sisipkan ke Materi
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mermaid Builder Logic
+  let targetEditorId = 'body_text_editor';
+
+  const defaultTemplates = {
+    flowchart: `graph TD\n    A[Mulai Belajar] --> B{Punya Akun?}\n    B -- Belum --> C[Daftar Akun EduSkill]\n    B -- Sudah --> D[Login ke Platform]\n    C --> D\n    D --> E[Pilih Kelas & Modul]\n    E --> F[Tonton Video / Baca Materi]\n    F --> G[Submit Tugas Akhir]\n    G --> H[Klaim Sertifikat Digital]`,
+    sequence: `sequenceDiagram\n    autonumber\n    actor Siswa\n    participant Web as EduSkill Web\n    participant API as Backend Server\n    participant DB as SQLite Database\n\n    Siswa->>Web: Buka Materi Pelajaran\n    Web->>API: GET /course/:slug/learn\n    API->>DB: Query Lesson & Progress\n    DB-->>API: Return Module Tree\n    API-->>Web: Render Artikel & Video\n    Web-->>Siswa: Tampilkan Halaman Classroom`,
+    architecture: `graph LR\n    subgraph Client [Siswa / Browser]\n        A[Web App Tailwind CSS]\n    end\n    subgraph Gateway [Cloudflare / Reverse Proxy]\n        B[Cloudflare Tunnel]\n    end\n    subgraph Server [Backend Node.js]\n        C[Express.js Engine]\n        D[AI Agent Automation]\n    end\n    subgraph Storage [Database & Assets]\n        E[(SQLite DB)]\n        F[WebP Uploads]\n    end\n\n    A --> B\n    B --> C\n    D --> C\n    C --> E\n    C --> F`,
+    erd: `erDiagram\n    USERS ||--o{ ENROLLMENTS : enrolls\n    COURSES ||--o{ MODULES : contains\n    MODULES ||--o{ LESSONS : has\n    USERS ||--o{ FINAL_SUBMISSIONS : submits\n    COURSES ||--o{ FINAL_SUBMISSIONS : for\n\n    USERS {\n        int id PK\n        string name\n        string email\n        string role\n    }\n    COURSES {\n        int id PK\n        string title\n        int price\n        string final_project_title\n    }\n    LESSONS {\n        int id PK\n        string title\n        string content_type\n        int is_preview\n    }`,
+    mindmap: `mindmap\n  root((Fullstack JS))\n    Frontend\n      HTML5 Semantik\n      Tailwind CSS\n      Alpine / React\n    Backend\n      Node.js Runtime\n      Express Framework\n      SQLite Database\n    Deployment\n      Cloudflare Tunnel\n      Docker Container`
+  };
+
+  function openMermaidModal(editorId) {
+    targetEditorId = editorId || 'body_text_editor';
+    const modal = document.getElementById('mermaid-builder-modal');
+    const input = document.getElementById('mermaid_code_input');
+
+    if (input && !input.value.trim()) {
+      input.value = defaultTemplates.flowchart;
+    }
+
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.renderIcons) window.renderIcons();
+      updateLiveMermaidPreview();
+    }
+  }
+
+  function closeMermaidModal() {
+    const modal = document.getElementById('mermaid-builder-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function applyMermaidTemplate(key) {
+    if (key && defaultTemplates[key]) {
+      const input = document.getElementById('mermaid_code_input');
+      if (input) {
+        input.value = defaultTemplates[key];
+        updateLiveMermaidPreview();
+      }
+    }
+  }
+
+  let renderDebounceTimer = null;
+  async function updateLiveMermaidPreview() {
+    const input = document.getElementById('mermaid_code_input');
+    const target = document.getElementById('mermaid_live_target');
+    const status = document.getElementById('mermaid_status_indicator');
+    if (!input || !target || typeof mermaid === 'undefined') return;
+
+    const rawCode = input.value.trim();
+    if (!rawCode) {
+      target.innerHTML = '<p class="text-xs text-slate-500">Tulis kode diagram untuk melihat preview...</p>';
+      return;
+    }
+
+    try {
+      const diagId = 'mermaid-preview-' + Math.random().toString(36).substring(2, 9);
+      const { svg } = await mermaid.render(diagId, rawCode);
+      target.innerHTML = svg;
+      if (status) {
+        status.innerHTML = '● Valid';
+        status.className = 'text-[10px] text-emerald-400 font-medium';
+      }
+    } catch (err) {
+      if (status) {
+        status.innerHTML = '● Syntax Error';
+        status.className = 'text-[10px] text-rose-400 font-medium';
+      }
+    }
+  }
+
+  const codeInput = document.getElementById('mermaid_code_input');
+  if (codeInput) {
+    codeInput.addEventListener('input', () => {
+      clearTimeout(renderDebounceTimer);
+      renderDebounceTimer = setTimeout(updateLiveMermaidPreview, 300);
+    });
+  }
+
+  function insertMermaidToEditor() {
+    const input = document.getElementById('mermaid_code_input');
+    const editor = document.getElementById(targetEditorId);
+    if (!input || !editor) return;
+
+    const mermaidBlock = `\n\`\`\`mermaid\n${input.value.trim()}\n\`\`\`\n`;
+    if (typeof insertTextAtCursor === 'function') {
+      insertTextAtCursor(editor, mermaidBlock);
+    } else {
+      const startPos = editor.selectionStart || 0;
+      const endPos = editor.selectionEnd || 0;
+      const currentVal = editor.value || '';
+      editor.value = currentVal.substring(0, startPos) + mermaidBlock + currentVal.substring(endPos, currentVal.length);
+      editor.focus();
+      editor.selectionStart = startPos + mermaidBlock.length;
+      editor.selectionEnd = startPos + mermaidBlock.length;
+    }
+    closeMermaidModal();
+  }
+</script>

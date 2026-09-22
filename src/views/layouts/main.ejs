@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' - EduSkill' : 'EduSkill - E-Learning Platform' %></title>
+  
+  <!-- Preconnect & Google Fonts (Loaded First for Accurate Mermaid Text Metrics) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN with Typography plugin -->
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <!-- Lucide Icons (Self-Hosted + CDN Fallback) -->
+  <script src="/lucide.min.js"></script>
+  <script>
+    if (!window.lucide) {
+      document.write('<script src="https://unpkg.com/lucide@latest"><\/script>');
+    }
+  </script>
+
+  <!-- Mermaid.js for Diagram & Flowchart Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    if (typeof mermaid !== 'undefined') {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+        fontSize: 13,
+        flowchart: {
+          htmlLabels: false,
+          useMaxWidth: true,
+          padding: 20,
+          nodeSpacing: 50,
+          rankSpacing: 50,
+          curve: 'basis'
+        },
+        sequence: {
+          useMaxWidth: true,
+          boxMargin: 12,
+          boxTextMargin: 6,
+          noteMargin: 12,
+          messageMargin: 35
+        },
+        themeVariables: {
+          darkMode: true,
+          fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+          fontSize: '13px',
+          background: '#0a1122',
+          mainBkg: '#111c35',
+          primaryColor: '#1d4ed8',
+          primaryTextColor: '#f0f6fc',
+          primaryBorderColor: '#3b82f6',
+          lineColor: '#60a5fa',
+          secondaryColor: '#1e3a8a',
+          secondaryTextColor: '#e2e8f0',
+          secondaryBorderColor: '#2563eb',
+          tertiaryColor: '#0f172a',
+          tertiaryTextColor: '#cbd5e1',
+          tertiaryBorderColor: '#1e293b',
+          noteBkgColor: '#172554',
+          noteTextColor: '#93c5fd',
+          noteBorderColor: '#2563eb',
+          actorBkg: '#1e3a8a',
+          actorBorder: '#3b82f6',
+          actorTextColor: '#f8fafc',
+          actorLineColor: '#60a5fa',
+          signalColor: '#60a5fa',
+          signalTextColor: '#93c5fd',
+          labelBoxBkgColor: '#111c35',
+          labelBoxBorderColor: '#2563eb',
+          labelTextColor: '#f1f5f9',
+          loopTextColor: '#93c5fd',
+          edgeLabelBackground: '#0b1329',
+          nodeBorder: '#3b82f6',
+          clusterBkg: '#0b152d',
+          clusterBorder: '#1d4ed8',
+          titleColor: '#60a5fa'
+        }
+      });
+    }
+  </script><style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ==========================================================
+       CUSTOM STYLING KHUSUS MATERI KELAS (ARTIKEL, TABEL, CALLOUT)
+       ========================================================== */
+    .article-content {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.85;
+    }
+
+    /* Headings */
+    .article-content h1 {
+      color: #f8fafc;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .article-content h2 {
+      color: #f1f5f9;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-top: 1.75rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .article-content h3 {
+      color: #e2e8f0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Paragraphs & Spacing */
+    .article-content p {
+      margin-bottom: 1.25rem;
+    }
+
+    /* Lists */
+    .article-content ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin-bottom: 1.25rem;
+      space-y: 0.5rem;
+    }
+    .article-content ul > li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .article-content ul > li::before {
+      content: "•";
+      position: absolute;
+      left: 0.35rem;
+      color: #818cf8;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+      top: 0.1rem;
+    }
+
+    .article-content ol {
+      list-style-type: decimal;
+      padding-left: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .article-content ol > li {
+      margin-bottom: 0.5rem;
+      padding-left: 0.25rem;
+    }
+
+    /* Modern Table Container & Styling */
+    .article-content table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      border-radius: 0.875rem;
+      overflow: hidden;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      background: rgba(15, 23, 42, 0.75);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    .article-content th {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      color: #818cf8;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.875rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+    }
+    .article-content td {
+      padding: 0.875rem 1.25rem;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+      vertical-align: middle;
+      line-height: 1.6;
+    }
+    .article-content tr:last-child td {
+      border-bottom: none;
+    }
+    .article-content tr:hover td {
+      background-color: rgba(99, 102, 241, 0.04);
+    }
+    .article-content td strong {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    /* Blockquote / Callout Box */
+    .article-content blockquote {
+      margin: 1.5rem 0;
+      padding: 1rem 1.25rem;
+      background: rgba(99, 102, 241, 0.08);
+      border-left: 4px solid #6366f1;
+      border-radius: 0 0.75rem 0.75rem 0;
+      color: #e2e8f0;
+      font-style: normal;
+    }
+    .article-content blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Code & Pre */
+    .article-content code:not(pre code) {
+      background: rgba(30, 41, 59, 0.8);
+      color: #a5b4fc;
+      padding: 0.15rem 0.45rem;
+      border-radius: 0.375rem;
+      font-size: 0.825rem;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+    }
+    .article-content pre {
+      background: #090d16 !important;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 0.875rem;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .article-content pre code {
+      background: transparent !important;
+      padding: 0;
+      color: #e2e8f0;
+      font-size: 0.85rem;
+      border: none;
+      line-height: 1.7;
+    }
+
+    /* Images inside Article */
+    .article-content img {
+      border-radius: 0.875rem;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      margin: 1.5rem auto;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Horizontal Rule */
+    .article-content hr {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+      margin: 2.25rem 0;
+    }
+
+    /* Mermaid Diagram Container & Interactive Viewer */
+    .mermaid-container {
+      margin: 1.75rem 0;
+      background: linear-gradient(180deg, #091122 0%, #060b18 100%);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 35px -10px rgba(15, 23, 42, 0.8), 0 0 20px -5px rgba(37, 99, 235, 0.15);
+    }
+    .mermaid-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    .mermaid-svg-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: auto;
+      overflow-y: hidden;
+      min-height: 120px;
+      padding: 0.5rem 0;
+    }
+    .mermaid-svg-wrapper svg {
+      margin: 0 auto !important;
+      max-width: 100% !important;
+      height: auto !important;
+      display: block !important;
+    }
+    .mermaid-fullscreen-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+    }
+    .mermaid-fullscreen-btn:hover {
+      background: rgba(37, 99, 235, 0.25);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.6);
+    }
+
+    /* Modal Diagram Viewer Content & Scroll Handling */
+    #global-diagram-modal-content {
+      display: flex;
+      overflow: auto;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem;
+      min-height: 380px;
+      background: radial-gradient(circle at center, #0b152d 0%, #060b18 100%);
+    }
+    #global-diagram-modal-content svg {
+      margin: auto !important;
+      max-width: 100% !important;
+      height: auto !important;
+      display: block !important;
+      filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.6));
+    }
+
+    
+    /* Mermaid SVG Tactical Dark Blue Styling */
+    .mermaid-svg-wrapper svg text,
+    #global-diagram-modal-content svg text,
+    #mermaid_preview_container svg text {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      fill: #f1f5f9 !important;
+    }
+    .mermaid-svg-wrapper svg .node rect,
+    .mermaid-svg-wrapper svg .node circle,
+    .mermaid-svg-wrapper svg .node polygon,
+    .mermaid-svg-wrapper svg .node path,
+    #global-diagram-modal-content svg .node rect,
+    #global-diagram-modal-content svg .node circle,
+    #global-diagram-modal-content svg .node polygon,
+    #global-diagram-modal-content svg .node path,
+    #mermaid_preview_container svg .node rect,
+    #mermaid_preview_container svg .node circle,
+    #mermaid_preview_container svg .node polygon,
+    #mermaid_preview_container svg .node path {
+      fill: #111e38 !important;
+      stroke: #3b82f6 !important;
+      stroke-width: 1.5px !important;
+    }
+    .mermaid-svg-wrapper svg .edgePath .path,
+    .mermaid-svg-wrapper svg .flowchart-link,
+    #global-diagram-modal-content svg .edgePath .path,
+    #global-diagram-modal-content svg .flowchart-link,
+    #mermaid_preview_container svg .edgePath .path,
+    #mermaid_preview_container svg .flowchart-link {
+      stroke: #60a5fa !important;
+      stroke-width: 1.75px !important;
+    }
+    .mermaid-svg-wrapper svg .marker,
+    #global-diagram-modal-content svg .marker,
+    #mermaid_preview_container svg .marker {
+      fill: #60a5fa !important;
+      stroke: #60a5fa !important;
+    }
+    .mermaid-svg-wrapper svg .cluster rect,
+    #global-diagram-modal-content svg .cluster rect,
+    #mermaid_preview_container svg .cluster rect {
+      fill: rgba(15, 23, 42, 0.6) !important;
+      stroke: #1d4ed8 !important;
+      stroke-width: 1.5px !important;
+      rx: 10px !important;
+    }
+    .mermaid-svg-wrapper svg .cluster text,
+    #global-diagram-modal-content svg .cluster text,
+    #mermaid_preview_container svg .cluster text {
+      fill: #93c5fd !important;
+      font-weight: 700 !important;
+    }
+    .mermaid-svg-wrapper svg .edgeLabel rect,
+    #global-diagram-modal-content svg .edgeLabel rect,
+    #mermaid_preview_container svg .edgeLabel rect {
+      fill: #0b1329 !important;
+      stroke: rgba(59, 130, 246, 0.4) !important;
+      rx: 4px !important;
+    }
+    .mermaid-svg-wrapper svg .edgeLabel text,
+    #global-diagram-modal-content svg .edgeLabel text,
+    #mermaid_preview_container svg .edgeLabel text {
+      fill: #93c5fd !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+    }
+    .mermaid-svg-wrapper svg .actor,
+    #global-diagram-modal-content svg .actor,
+    #mermaid_preview_container svg .actor {
+      fill: #172554 !important;
+      stroke: #3b82f6 !important;
+    }
+    .mermaid-svg-wrapper svg text.actor > tspan,
+    #global-diagram-modal-content svg text.actor > tspan,
+    #mermaid_preview_container svg text.actor > tspan {
+      fill: #f8fafc !important;
+    }
+    .mermaid-svg-wrapper svg .actor-line,
+    #global-diagram-modal-content svg .actor-line,
+    #mermaid_preview_container svg .actor-line {
+      stroke: #60a5fa !important;
+      stroke-dasharray: 4 !important;
+    }
+    .mermaid-svg-wrapper svg .messageLine0,
+    .mermaid-svg-wrapper svg .messageLine1,
+    #global-diagram-modal-content svg .messageLine0,
+    #global-diagram-modal-content svg .messageLine1,
+    #mermaid_preview_container svg .messageLine0,
+    #mermaid_preview_container svg .messageLine1 {
+      stroke: #60a5fa !important;
+      stroke-width: 1.75px !important;
+    }
+    .mermaid-svg-wrapper svg .messageText,
+    #global-diagram-modal-content svg .messageText,
+    #mermaid_preview_container svg .messageText {
+      fill: #93c5fd !important;
+    }
+/* Links */
+    .article-content a {
+      color: #818cf8;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+    .article-content a:hover {
+      color: #a5b4fc;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Navbar -->
+  <header class="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-8">
+        <a href="/" class="flex items-center gap-2.5 font-bold text-xl tracking-tight text-white group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+          </div>
+          <span>Edu<span class="text-indigo-400">Skill</span></span>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+          <a href="/" class="hover:text-indigo-400 transition-colors">Katalog Kelas</a>
+          <% if (currentUser) { %>
+            <a href="/my-courses" class="hover:text-indigo-400 transition-colors">Kelas Saya</a>
+          <% } %>
+          <% if (currentUser && currentUser.role === 'admin') { %>
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-1">
+              <a href="/admin/dashboard" class="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-amber-400/10 transition-colors">
+                <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard
+              </a>
+              <a href="/admin/courses" class="text-xs text-slate-300 hover:text-white font-semibold flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-slate-800 transition-colors">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Kelola Kelas
+              </a>
+              <a href="/admin/submissions" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-emerald-400/10 transition-colors">
+                <i data-lucide="file-check" class="w-3.5 h-3.5"></i> Review Tugas
+              </a>
+            </div>
+          <% } %>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <% if (currentUser) { %>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-400 hidden sm:inline-block">Halo, <strong class="text-slate-200"><%= currentUser.name %></strong></span>
+            <a href="/auth/logout" class="px-3 py-1.5 text-xs font-semibold text-rose-400 hover:text-rose-300 border border-rose-500/20 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Keluar
+            </a>
+          </div>
+        <% } else { %>
+          <a href="/auth/login" class="text-sm font-medium text-slate-300 hover:text-white px-3 py-1.5 transition-colors">Masuk</a>
+          <a href="/auth/register" class="text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl shadow-lg shadow-indigo-600/25 transition-all">Daftar Sekarang</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  <% if (flashSuccess) { %>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+      <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm flex items-center gap-3">
+        <i data-lucide="circle-check" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+        <span><%= flashSuccess %></span>
+      </div>
+    </div>
+  <% } %>
+
+  <% if (flashError) { %>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+      <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-center gap-3">
+        <i data-lucide="triangle-alert" class="w-5 h-5 text-rose-400 shrink-0"></i>
+        <span><%= flashError %></span>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Main Body Content -->
+  <main class="flex-1">
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-8 mt-16 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>&copy; 2026 EduSkill ZERIF ID</p>
+    </div>
+  </footer>
+
+  <script>
+    function renderIcons() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+
+    // Render Mermaid diagrams inside .article-content or classroom
+    async function renderMermaidDiagrams() {
+      if (typeof mermaid === 'undefined') return;
+
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (e) {}
+      }
+
+      const codeBlocks = document.querySelectorAll('pre code.language-mermaid, pre code.mermaid');
+      for (let i = 0; i < codeBlocks.length; i++) {
+        const codeEl = codeBlocks[i];
+        const preEl = codeEl.closest('pre');
+        if (!preEl || preEl.dataset.mermaidRendered) continue;
+
+        preEl.dataset.mermaidRendered = 'true';
+        const rawCode = codeEl.textContent.trim();
+        const diagramId = 'mermaid-diag-' + Math.random().toString(36).substring(2, 9);
+
+        // Container wrapper
+        const container = document.createElement('div');
+        container.className = 'mermaid-container group';
+        container.innerHTML = `
+          <div class="mermaid-header">
+            <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> Diagram Alur / Mermaid
+            </span>
+            <button type="button" class="mermaid-fullscreen-btn" onclick="openDiagramModal(this)">
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> Perbesar View
+            </button>
+          </div>
+          <div class="mermaid-svg-wrapper" id="${diagramId}">
+            <div class="text-xs text-slate-500 py-4 flex items-center gap-2">
+              <span class="animate-spin">⏳</span> Merender diagram...
+            </div>
+          </div>
+        `;
+
+        preEl.parentNode.insertBefore(container, preEl);
+        preEl.style.display = 'none'; // Sembunyikan blok teks mentah
+
+        try {
+          const { svg } = await mermaid.render(diagramId + '-svg', rawCode);
+          const svgWrapper = document.getElementById(diagramId);
+          if (svgWrapper) {
+            svgWrapper.innerHTML = svg;
+          }
+        } catch (err) {
+          const svgWrapper = document.getElementById(diagramId);
+          if (svgWrapper) {
+            svgWrapper.innerHTML = `<div class="p-3 text-xs text-rose-400 bg-rose-950/40 rounded-lg border border-rose-500/30">⚠️ Gagal merender diagram Mermaid: ${err.message || 'Syntax error'}</div>`;
+          }
+        }
+      }
+
+      renderIcons();
+    }
+
+    // Modal Viewer untuk Diagram Fullscreen & Interactive Zoom
+    let currentDiagramScale = 1;
+
+    function zoomDiagram(delta) {
+      const modalContent = document.getElementById('global-diagram-modal-content');
+      if (!modalContent) return;
+      const svg = modalContent.querySelector('svg');
+      if (!svg) return;
+
+      currentDiagramScale = Math.min(Math.max(0.4, currentDiagramScale + delta), 2.5);
+      svg.style.transform = `scale(${currentDiagramScale})`;
+      svg.style.transformOrigin = 'top center';
+      svg.style.transition = 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)';
+
+      const label = document.getElementById('diagram-zoom-label');
+      if (label) {
+        label.textContent = Math.round(currentDiagramScale * 100) + '%';
+      }
+    }
+
+    function resetDiagramZoom() {
+      currentDiagramScale = 1;
+      const modalContent = document.getElementById('global-diagram-modal-content');
+      if (!modalContent) return;
+      const svg = modalContent.querySelector('svg');
+      if (svg) {
+        svg.style.transform = 'scale(1)';
+        svg.style.transformOrigin = 'top center';
+      }
+      const label = document.getElementById('diagram-zoom-label');
+      if (label) {
+        label.textContent = '100%';
+      }
+    }
+
+    function openDiagramModal(btn) {
+      const container = btn.closest('.mermaid-container');
+      if (!container) return;
+      const svgWrapper = container.querySelector('.mermaid-svg-wrapper');
+      if (!svgWrapper) return;
+
+      const modal = document.getElementById('global-diagram-modal');
+      const modalContent = document.getElementById('global-diagram-modal-content');
+      if (modal && modalContent) {
+        modalContent.innerHTML = svgWrapper.innerHTML;
+        resetDiagramZoom();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        renderIcons();
+      }
+    }
+
+    function closeDiagramModal() {
+      const modal = document.getElementById('global-diagram-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderIcons();
+      renderMermaidDiagrams();
+    });
+    window.addEventListener('load', () => {
+      renderIcons();
+      renderMermaidDiagrams();
+    });
+    renderIcons();
+  </script>
+
+  <!-- Global Fullscreen Modal for Mermaid Diagrams -->
+  <div id="global-diagram-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md items-center justify-center p-4 sm:p-6" onclick="if(event.target === this) closeDiagramModal()">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center border border-blue-500/30 shadow-md shadow-blue-500/10">
+            <i data-lucide="git-branch" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Visual Diagram Viewer</h3>
+            <p class="text-[11px] text-slate-400">Tampilan Vektor Interaktif Beresolusi Tinggi</p>
+          </div>
+        </div>
+
+        <!-- Zoom Controls & Close Button -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-1 gap-1">
+            <button type="button" onclick="zoomDiagram(-0.15)" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg text-xs font-bold transition-colors" title="Zoom Out">
+              <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+            </button>
+            <span id="diagram-zoom-label" class="text-[11px] font-mono text-slate-300 font-semibold px-2">100%</span>
+            <button type="button" onclick="zoomDiagram(0.15)" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg text-xs font-bold transition-colors" title="Zoom In">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="resetDiagramZoom()" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg text-xs transition-colors border-l border-slate-800 ml-0.5" title="Reset Zoom">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <button type="button" onclick="closeDiagramModal()" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors ml-1">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Content Body -->
+      <div id="global-diagram-modal-content" class="overflow-auto flex-1">
+        <!-- SVG Injected Here -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

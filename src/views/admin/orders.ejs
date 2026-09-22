@@ -1,0 +1,55 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-extrabold text-white tracking-tight">Daftar Transaksi</h1>
+    <p class="text-xs text-slate-400 mt-1">Riwayat order pembelian kelas dan status pembayaran.</p>
+  </div>
+
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs text-slate-300">
+        <thead class="bg-slate-950/60 text-slate-400 font-semibold border-b border-slate-800">
+          <tr>
+            <th class="px-6 py-3.5">Invoice</th>
+            <th class="px-6 py-3.5">Siswa</th>
+            <th class="px-6 py-3.5">Kelas</th>
+            <th class="px-6 py-3.5">Nominal</th>
+            <th class="px-6 py-3.5">Status</th>
+            <th class="px-6 py-3.5">Metode</th>
+            <th class="px-6 py-3.5">Waktu</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/60">
+          <% if (orders.length === 0) { %>
+            <tr>
+              <td colspan="7" class="px-6 py-8 text-center text-slate-500">Belum ada data transaksi.</td>
+            </tr>
+          <% } %>
+          <% orders.forEach(o => { %>
+            <tr class="hover:bg-slate-800/30 transition-colors">
+              <td class="px-6 py-3.5 font-mono text-indigo-300 font-semibold">
+                <a href="/orders/<%= o.order_code %>" class="hover:underline"><%= o.order_code %></a>
+              </td>
+              <td class="px-6 py-3.5">
+                <div class="font-medium text-slate-200"><%= o.user_name %></div>
+                <div class="text-[11px] text-slate-500"><%= o.user_email %></div>
+              </td>
+              <td class="px-6 py-3.5 text-slate-200"><%= o.course_title %></td>
+              <td class="px-6 py-3.5 font-semibold text-slate-100">Rp <%= Number(o.amount).toLocaleString('id-ID') %></td>
+              <td class="px-6 py-3.5">
+                <% if (o.status === 'paid') { %>
+                  <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LUNAS</span>
+                <% } else if (o.status === 'pending') { %>
+                  <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">PENDING</span>
+                <% } else { %>
+                  <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20"><%= o.status.toUpperCase() %></span>
+                <% } %>
+              </td>
+              <td class="px-6 py-3.5 text-slate-400 uppercase text-[11px]"><%= o.payment_type || '-' %></td>
+              <td class="px-6 py-3.5 text-slate-400 text-[11px]"><%= new Date(o.created_at).toLocaleString('id-ID') %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
